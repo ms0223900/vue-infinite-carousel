@@ -11,14 +11,18 @@
 import CarouselList from '@/components/CarouselList.vue';
 import { defineComponent, PropType } from 'vue';
 
-const minusKey = (key = -1, maxKey = 1) => {
-  if (key === -1) return maxKey;
-  return key - 1;
-};
-const addKey = (key = -1, maxKey = 1) => {
-  if (key === maxKey) return -1;
-  return key + 1;
-};
+function rotateList<Data>(arr = [] as Data[], idx = 0) {
+  return [...arr.slice(idx), ...arr.slice(0, idx)];
+}
+
+// const minusKey = (key = -1, maxKey = 1) => {
+//   if (key === -1) return maxKey;
+//   return key - 1;
+// };
+// const addKey = (key = -1, maxKey = 1) => {
+//   if (key === maxKey) return -1;
+//   return key + 1;
+// };
 const convertImgList = (imgList: string[]) => {
   let filledImgList = [...imgList];
   if (imgList.length === 1) {
@@ -32,18 +36,12 @@ const convertImgList = (imgList: string[]) => {
     filledImgList = [...imgList, ...imgList];
   }
   const lastIdx = filledImgList.length - 1;
-  return ([
-    {
-      posKey: -1,
-      name: 'pic',
-      src: filledImgList[lastIdx],
-    },
-    ...filledImgList.slice(0, lastIdx).map((img, i) => ({
-      posKey: i,
-      name: 'pic',
-      src: img,
-    })),
-  ]);
+  filledImgList = rotateList(filledImgList, lastIdx);
+  return filledImgList.map((img, i) => ({
+    // posKey: i - 1,
+    name: `pic-${i}`,
+    src: img,
+  }));
 };
 
 export default defineComponent({
@@ -65,11 +63,14 @@ export default defineComponent({
   },
   methods: {
     handleUpdateImgPosKey(minusOrAdd = 'minus') {
-      const maxKey = this.imgListData.length - 2;
+      // const maxKey = this.imgListData.length - 2;
+      const lastIdx = this.imgListData.length - 1;
       const newImgListData = minusOrAdd === 'minus' ? (
-        this.imgListData.map((img) => ({ ...img, posKey: minusKey(img.posKey, maxKey) }))
+        // this.imgListData.map((img) => ({ ...img, posKey: minusKey(img.posKey, maxKey) }))
+        rotateList(this.imgListData, 1)
       ) : (
-        this.imgListData.map((img) => ({ ...img, posKey: addKey(img.posKey, maxKey) }))
+        // this.imgListData.map((img) => ({ ...img, posKey: addKey(img.posKey, maxKey) }))
+        rotateList(this.imgListData, lastIdx)
       );
       this.imgListData = newImgListData;
       clearInterval(this.timer);

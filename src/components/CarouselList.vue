@@ -3,8 +3,8 @@
     <button class="carousel-btn left" @click="$emit('update-left-shift')">{{ '＜' }}</button>
     <carousel-item
       v-for="(imgData, i) in imgListData"
-      :key="i"
-      :singleImgData="imgData"
+      :key="imgData.name"
+      :singleImgData="({ ...imgData, posKey: i - 1 })"
     />
     <button class="carousel-btn right" @click="$emit('update-right-shift')">{{ '＞' }}</button>
   </div>
